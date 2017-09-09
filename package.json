@@ -1,0 +1,30 @@
+{
+  "name": "ble-standard-identifiers",
+  "version": "1.0.0",
+  "description": "The current, publicly published Service, Characteristic, Declarations, and Descriptor IDs.",
+  "main": "ble-standard-identifiers.js",
+  "module": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/capnmidnight/ble-standard-identifiers.git"
+  },
+  "files": [
+    "src/",
+    "ble-standard-identifiers.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "Bluetooth",
+    "BLE"
+  ],
+  "author": "Sean T. McBeth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/capnmidnight/ble-standard-identifiers/issues"
+  },
+  "homepage": "https://github.com/capnmidnight/ble-standard-identifiers#readme",
+  "devDependencies": {
+    "marigold-build": "^1.14.0"
+  }
+}
