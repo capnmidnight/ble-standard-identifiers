@@ -1,12 +1,16 @@
 "use strict";
 
 export default function makeLookup(descriptions) {
-  const table = {},
+  const idLookup = {},
+    descLookup = {},
     all = Object.keys(descriptions)
-    .map( (id) => {
-      table[descriptions[id]] = id;
-      return parseInt(id, 16);
-    });
+      .map( (id) => {
+        const idValue = parseInt(id, 16),
+          descValue = descriptions[id];
+        idLookup[descValue] = idValue;
+        descLookup[idValue] = descValue;
+        return idValue;
+      });
 
   function description(id) {
     /*
@@ -14,12 +18,14 @@ export default function makeLookup(descriptions) {
       (4 bytes) are guaranteed to be unique amongst all Services, Characteristics,
       and Descriptors, because there just aren't that many of them.
     */
-    id = id.substring(0, 8).toLocaleUpperCase();
-    return descriptions[id] || id;
+    if(typeof id === "string" || id instanceof "String") {
+      id = parseInt(id.substring(0, 8).toLocaleUpperCase(), 16);
+    }
+    return descLookup[id] || id;
   }
 
   function id(description) {
-    return table[description];
+    return idLookup[description];
   }
 
   return {

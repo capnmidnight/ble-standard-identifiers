@@ -5,12 +5,16 @@
 }(this, (function (exports) { 'use strict';
 
 function makeLookup(descriptions) {
-  const table = {},
+  const idLookup = {},
+    descLookup = {},
     all = Object.keys(descriptions)
-    .map( (id) => {
-      table[descriptions[id]] = id;
-      return parseInt(id, 16);
-    });
+      .map( (id) => {
+        const idValue = parseInt(id, 16),
+          descValue = descriptions[id];
+        idLookup[descValue] = idValue;
+        descLookup[idValue] = descValue;
+        return idValue;
+      });
 
   function description(id) {
     /*
@@ -18,12 +22,14 @@ function makeLookup(descriptions) {
       (4 bytes) are guaranteed to be unique amongst all Services, Characteristics,
       and Descriptors, because there just aren't that many of them.
     */
-    id = id.substring(0, 8).toLocaleUpperCase();
-    return descriptions[id] || id;
+    if(typeof id === "string" || id instanceof "String") {
+      id = parseInt(id.substring(0, 8).toLocaleUpperCase(), 16);
+    }
+    return descLookup[id] || id;
   }
 
   function id(description) {
-    return table[description];
+    return idLookup[description];
   }
 
   return {
@@ -32,6 +38,18 @@ function makeLookup(descriptions) {
     description
   };
 }
+
+/*
+  In Bluetooth GATT, Services are collections of Characteristics. The collection
+  of Characteristics into Services is intended to make certain combinations of
+  basic devices into larger, aggregated devices easier and faster.
+
+  The following lookup table provides all of the standard, registered Services
+  as of September 1st, 2017.
+
+  Theoretically, Services have a required set of Characteristics, though I've
+  never seen this enforced. A lot of apps assume any particular Service will only ever contain one of any type of Characteristic, but this is not expressed in the spec and only comes about from folks who don't understand how Descriptors work to differentiate between multiple Characteristics of the same type. Services in practice are nothing but an arbitrary ID coupled with an arbitrary set of Characteristics. This makes it possible for vendors to make up their own Services whenever they want. Just be sure to stick to the higher value ranges so you don't step on anyone else's toes.
+*/
 
 var services = makeLookup({
   "00001811": "Alert Notification Service",
@@ -78,6 +96,39 @@ var declarations = makeLookup({
   "00002800": "Primary Service",
   "00002801": "Secondary Service"
 });
+
+/*
+  In Bluetooth GATT, Characteristics are key-value pairs, collected into "Services",
+  that represent the raw functionality of your device. Characteristics support
+  both reading from and writing to, as well as notification events when values
+  change.
+
+  The following lookup table provides all of the standard, registered Characteristics
+  as of September 1st, 2017.
+
+  The supported data types are very primitive:
+    - Strings of up to 20 bytes in length, and strictly in ASCII encoding
+    - Integers in 1, 2, or 4 byte lengths
+    - Floats in 4 or 8 byte lengths
+    - "Auto", which is basically just a String
+
+  Characteristics can also have Descriptors, which provide more metadata about
+  the value, e.g. friendly, readable descriptions when more than one "ANALOG"
+  type characteristic is included in a Service.
+
+  Theoretically, Services have a required set of Characteristics, though I've
+  never seen this enforced. Characteristics are supposed to also have a proscribed
+  data type and length, but this is not enforced by the Bluetooth stack, either,
+  and is really only an aid to consuming application. A lot of apps assume any
+  particular Service will only ever contain one of any type of Characteristic,
+  but this is not expressed in the spec and only comes about from folks who don't
+  understand how Descriptors work to differentiate between multiple Characteristics
+  of the same type. Characteristics in practice are nothing but an arbitrary ID
+  coupled with an arbitrary set of metadata and an arbitrary value. This makes it
+  possible for vendors to make up their own Characteristics whenever they want.
+  Just be sure to stick to the higher value ranges so you don't step on anyone
+  else's toes.
+*/
 
 var characteristics = makeLookup({
   "00002A7E": "Aerobic Heart Rate Lower Limit",
@@ -297,6 +348,29 @@ var characteristics = makeLookup({
   "00002A9E": "Weight Scale Feature",
   "00002A79": "Wind Chill",
 });
+
+/*
+  In Bluetooth GATT, Descriptors are key-value pairs, stored on a "Characteristic",
+  that provide metadata about how the Characteristic should work. They are technically
+  Characteristics themselves, so they use many of the same functions.
+
+  The following lookup table provides all of the standard, registered Descriptors
+  as of September 1st, 2017.
+
+  The supported data types are very primitive:
+    - Strings of up to 20 bytes in length, and strictly in ASCII encoding
+    - Integers in 1, 2, or 4 byte lengths
+    - Floats in 4 or 8 byte lengths
+    - "Auto", which is basically just a String
+
+  Theoretically, Descriptors are supposed to also have a proscribed data type and
+  length, but this is not enforced by the Bluetooth stack, and is really only an
+  aid to consuming application. A lot of apps ignore Descriptors entirely, but
+  that is a big mistake. Descriptors in practice are nothing but an arbitrary ID
+  coupled with an arbitrary an arbitrary value. This makes it possible for vendors
+  to make up their own Descriptors whenever they want. Just be sure to stick to
+  the higher value ranges so you don't step on anyone else's toes.
+*/
 
 var descriptors = makeLookup({
   "00002905": "Characteristic Aggregate Format",

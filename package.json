@@ -1,6 +1,6 @@
 {
   "name": "ble-standard-identifiers",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The current, publicly published Service, Characteristic, Declarations, and Descriptor IDs.",
   "main": "ble-standard-identifiers.js",
   "module": "src/index.js",
